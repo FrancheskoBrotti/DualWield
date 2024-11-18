@@ -14,17 +14,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public final class NMS_v1_21_R1 implements NMS {
+public final class NMS_v1_21_R2_paper implements NMS {
     @Override
-    public void handAnimation(Player player, org.bukkit.inventory.EquipmentSlot equipmentSlot) {
+    public void handAnimation(Player player,
+                              org.bukkit.inventory.EquipmentSlot equipmentSlot) {
         switch (equipmentSlot) {
             case HAND: {
                 player.swingMainHand();
@@ -66,22 +67,22 @@ public final class NMS_v1_21_R1 implements NMS {
 
     @Override
     public double getAttackDamage(org.bukkit.inventory.ItemStack itemStack) {
-        return getItemStackAttribute(itemStack, Attribute.GENERIC_ATTACK_DAMAGE);
+        return getItemStackAttribute(itemStack, Attribute.ATTACK_DAMAGE);
     }
 
     @Override
     public double getAttackSpeed(org.bukkit.inventory.ItemStack itemStack) {
-        return getItemStackAttribute(itemStack, Attribute.GENERIC_ATTACK_SPEED);
+        return getItemStackAttribute(itemStack, Attribute.ATTACK_SPEED);
     }
 
     private double getItemStackAttribute(org.bukkit.inventory.ItemStack itemStack, org.bukkit.attribute.Attribute attribute) {
         if (itemStack.getAmount() != 0) {
             for (org.bukkit.attribute.AttributeModifier modifier : itemStack.getType().getDefaultAttributeModifiers(itemStack.clone().getType().getEquipmentSlot()).values()) {
-                if (attribute == Attribute.GENERIC_ATTACK_DAMAGE) {
+                if (attribute == Attribute.ATTACK_DAMAGE) {
                     // Return the base attack damage modifier amount
                     return modifier.getAmount();
                 }
-                if (attribute == Attribute.GENERIC_ATTACK_SPEED) {
+                if (attribute == Attribute.ATTACK_SPEED) {
                     // Return the base speed damage modifier amount
                     return modifier.getAmount();
                 }
@@ -98,7 +99,7 @@ public final class NMS_v1_21_R1 implements NMS {
             Block nmsBlock = serverLevel.getBlockState(new BlockPos(block.getX(), block.getY(), block.getZ())).getBlock();
             SoundType soundType = nmsBlock.defaultBlockState().getSoundType();
 
-            return Sound.valueOf(soundType.getHitSound().getLocation().getPath().toUpperCase()
+            return Sound.valueOf(soundType.getHitSound().location().getPath().toUpperCase()
                     .replace(".", "_"));
         } catch (IllegalArgumentException ignored) {
         }
