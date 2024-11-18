@@ -18,6 +18,46 @@
         </dependency>
         <dependency>
             <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_21_R2_paper</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_21_R1_paper</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_20_R4_paper</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_21_R2</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_21_R1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_20_R4</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_20_R3</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>dualwield-v1_20_R2</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
             <artifactId>dualwield-v1_20_R1</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

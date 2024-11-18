@@ -9,6 +9,7 @@ import com.ranull.dualwield.manager.DualWieldManager;
 import com.ranull.dualwield.manager.VersionManager;
 import com.ranull.dualwield.nms.NMS;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Server;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -120,11 +121,42 @@ public final class DualWield extends JavaPlugin {
             if (NMS.class.isAssignableFrom(clazz)) {
                 nms = (NMS) clazz.getDeclaredConstructor().newInstance();
             }
-
             return nms != null;
         } catch (ArrayIndexOutOfBoundsException | ClassNotFoundException | InstantiationException |
-                 IllegalAccessException | NoSuchMethodException | InvocationTargetException ignored) {
-            return false;
+                 IllegalAccessException | NoSuchMethodException | InvocationTargetException try_handle) {
+            try {
+                String bukkitVersion = getServer().getBukkitVersion();
+                getServer().getConsoleSender().sendMessage("Bukkit version: " + bukkitVersion);
+                String bukkitVersionFormed = bukkitVersion.replace("-R0.1-SNAPSHOT","");
+                getServer().getConsoleSender().sendMessage("Bukkit_version: " + bukkitVersionFormed);
+                String version;
+                String latest = "v1_21_R2_paper";
+                switch (bukkitVersionFormed) {
+                    case "1.20.5":
+                    case "1.20.6":
+                        version = "v1_20_R4_paper";
+                    case "1.21.0":
+                    case "1.21.1":
+                        version = "v1_21_R1_paper";
+                    case "1.21.2":
+                    case "1.21.3":
+                        version = "v1_21_R2_paper";
+                    default:
+                        version = latest;
+                }
+                Class<?> clazz = Class.forName("com.ranull.dualwield.nms.NMS_" + version);
+
+                if (NMS.class.isAssignableFrom(clazz)) {
+                    nms = (NMS) clazz.newInstance();
+                }
+                try {
+                    getServer().getConsoleSender().sendMessage(String.valueOf(nms != null));
+                } catch (Exception ignored) {}
+                return nms != null;
+            } catch (ArrayIndexOutOfBoundsException | ClassNotFoundException | InstantiationException
+                     | IllegalAccessException ignored2) {
+                return false;
+            }
         }
     }
 }
