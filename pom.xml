@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ranull</groupId>
+    <artifactId>dualwield-parent</artifactId>
+    <name>DualWield</name>
+    <description>Off-hand attacking and tool usage, use your weapons and tools in the off-hand.</description>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
+    <developers>
+        <developer>
+            <name>Ranull</name>
+            <url>https://gitlab.com/ranull/minecraft/dualwield/</url>
+        </developer>
+    </developers>
+
+    <properties>
+        <revision>3.1</revision>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <modules>
+        <module>core</module>
+        <module>dist</module>
+        <module>v1_20_R1</module>
+        <module>v1_19_R3</module>
+        <module>v1_19_R2</module>
+        <module>v1_19_R1</module>
+        <module>v1_18_R2</module>
+        <module>v1_18_R1</module>
+        <module>v1_17_R1</module>
+        <module>v1_16_R3</module>
+        <module>v1_16_R2</module>
+        <module>v1_16_R1</module>
+        <module>v1_15_R1</module>
+        <module>v1_14_R1</module>
+        <module>v1_13_R2</module>
+        <module>v1_13_R1</module>
+        <module>v1_12_R1</module>
+        <module>v1_11_R1</module>
+        <module>v1_10_R1</module>
+        <module>v1_9_R2</module>
+        <module>v1_9_R1</module>
+    </modules>
+
+    <build>
+        <defaultGoal>clean package</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations-java5</artifactId>
+            <version>23.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
