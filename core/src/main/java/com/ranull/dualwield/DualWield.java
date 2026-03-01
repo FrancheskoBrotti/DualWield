@@ -130,17 +130,29 @@ public final class DualWield extends JavaPlugin {
                 String bukkitVersionFormed = bukkitVersion.replace("-R0.1-SNAPSHOT","");
                 getServer().getConsoleSender().sendMessage("Bukkit_version: " + bukkitVersionFormed);
                 String version;
-                String latest = "v1_21_R2_paper";
+                String latest = "v1_21_R7_paper";
                 switch (bukkitVersionFormed) {
                     case "1.20.5":
                     case "1.20.6":
                         version = "v1_20_R4_paper";
+                        break;
                     case "1.21.0":
                     case "1.21.1":
                         version = "v1_21_R1_paper";
+                        break;
                     case "1.21.2":
                     case "1.21.3":
                         version = "v1_21_R2_paper";
+                        break;
+                    case "1.21.4":
+                        version = "v1_21_R3_paper";
+                        break;
+                    case "1.21.8":
+                        version = "v1_21_R5_paper";
+                        break;
+                    case "1.21.11":
+                        version = "v1_21_R7_paper";
+                        break;
                     default:
                         version = latest;
                 }
