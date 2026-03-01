@@ -32,17 +32,15 @@ jobs:
           curl -o /tmp/buildtools/BuildTools.jar \
             https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
 
-      - name: Install Spigot versions via BuildTools
+      - name: Install Spigot 1.21.8 via BuildTools
         run: |
-          for VERSION in 1.21.8 1.21.11; do
-            echo "Building Spigot $VERSION..."
-            mkdir -p /tmp/buildtools/$VERSION && cd /tmp/buildtools/$VERSION
-            java -jar /tmp/buildtools/BuildTools.jar \
-              --rev $VERSION \
-              --compile CRAFTBUKKIT \
-              --remapped
-            cd ..
-          done
+          mkdir -p /tmp/buildtools/1.21.8 && cd /tmp/buildtools/1.21.8
+          java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.8 --compile CRAFTBUKKIT --remapped
+
+      - name: Install Spigot 1.21.11 via BuildTools
+        run: |
+          mkdir -p /tmp/buildtools/1.21.11 && cd /tmp/buildtools/1.21.11
+          java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.11 --compile CRAFTBUKKIT --remapped
 
       - name: Build with Maven
         run: mvn clean package -B --no-transfer-progress
