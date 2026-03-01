@@ -36,15 +36,44 @@ jobs:
         run: |
           mkdir -p /tmp/buildtools/1.21.8 && cd /tmp/buildtools/1.21.8
           java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.8 --remapped
-          echo "Verifying 1.21.8 remapped artifact..."
-          ls ~/.m2/repository/org/spigotmc/spigot/1.21.8-R0.1-SNAPSHOT/*remapped-mojang* || echo "WARNING: remapped-mojang not found!"
+          REMAPPED_JAR=$(ls ~/.m2/repository/org/spigotmc/spigot/1.21.8-R0.1-SNAPSHOT/*remapped-mojang*.jar 2>/dev/null | head -1)
+          if [ -z "$REMAPPED_JAR" ]; then
+            echo "ERROR: remapped-mojang jar not found!"
+            ls ~/.m2/repository/org/spigotmc/spigot/1.21.8-R0.1-SNAPSHOT/
+            exit 1
+          fi
+          SPIGOT_POM=$(ls ~/.m2/repository/org/spigotmc/spigot/1.21.8-R0.1-SNAPSHOT/*.pom | head -1)
+          echo "Found: $REMAPPED_JAR"
+          mvn install:install-file \
+            -Dfile="$REMAPPED_JAR" \
+            -DgroupId=org.spigotmc \
+            -DartifactId=spigot \
+            -Dversion=1.21.8-R0.1-SNAPSHOT \
+            -Dclassifier=remapped-mojang \
+            -Dpackaging=jar \
+            -DpomFile="$SPIGOT_POM"
 
       - name: Install Spigot 1.21.11 via BuildTools
         run: |
           mkdir -p /tmp/buildtools/1.21.11 && cd /tmp/buildtools/1.21.11
           java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.11 --remapped
           echo "Verifying 1.21.11 remapped artifact..."
-          ls ~/.m2/repository/org/spigotmc/spigot/1.21.11-R0.1-SNAPSHOT/*remapped-mojang* || echo "WARNING: remapped-mojang not found!"
+          REMAPPED_JAR=$(ls ~/.m2/repository/org/spigotmc/spigot/1.21.11-R0.1-SNAPSHOT/*remapped-mojang*.jar 2>/dev/null | head -1)
+          if [ -z "$REMAPPED_JAR" ]; then
+            echo "ERROR: remapped-mojang jar not found!"
+            ls ~/.m2/repository/org/spigotmc/spigot/1.21.11-R0.1-SNAPSHOT/
+            exit 1
+          fi
+          SPIGOT_POM=$(ls ~/.m2/repository/org/spigotmc/spigot/1.21.11-R0.1-SNAPSHOT/*.pom | head -1)
+          echo "Found: $REMAPPED_JAR"
+          mvn install:install-file \
+            -Dfile="$REMAPPED_JAR" \
+            -DgroupId=org.spigotmc \
+            -DartifactId=spigot \
+            -Dversion=1.21.11-R0.1-SNAPSHOT \
+            -Dclassifier=remapped-mojang \
+            -Dpackaging=jar \
+            -DpomFile="$SPIGOT_POM"
 
       - name: Build with Maven
         run: mvn clean package -B --no-transfer-progress
