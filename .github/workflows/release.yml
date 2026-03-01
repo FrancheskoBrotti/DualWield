@@ -35,12 +35,16 @@ jobs:
       - name: Install Spigot 1.21.8 via BuildTools
         run: |
           mkdir -p /tmp/buildtools/1.21.8 && cd /tmp/buildtools/1.21.8
-          java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.8 --compile CRAFTBUKKIT --remapped
+          java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.8 --remapped
+          echo "Verifying 1.21.8 remapped artifact..."
+          ls ~/.m2/repository/org/spigotmc/spigot/1.21.8-R0.1-SNAPSHOT/*remapped-mojang* || echo "WARNING: remapped-mojang not found!"
 
       - name: Install Spigot 1.21.11 via BuildTools
         run: |
           mkdir -p /tmp/buildtools/1.21.11 && cd /tmp/buildtools/1.21.11
-          java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.11 --compile CRAFTBUKKIT --remapped
+          java -jar /tmp/buildtools/BuildTools.jar --rev 1.21.11 --remapped
+          echo "Verifying 1.21.11 remapped artifact..."
+          ls ~/.m2/repository/org/spigotmc/spigot/1.21.11-R0.1-SNAPSHOT/*remapped-mojang* || echo "WARNING: remapped-mojang not found!"
 
       - name: Build with Maven
         run: mvn clean package -B --no-transfer-progress
