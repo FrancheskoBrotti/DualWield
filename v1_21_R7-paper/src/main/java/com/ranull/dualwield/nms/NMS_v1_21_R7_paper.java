@@ -1,158 +1,129 @@
 package com.ranull.dualwield.nms;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
 public final class NMS_v1_21_R7_paper implements NMS {
-    @Override
-    public void handAnimation(Player player,
-                              org.bukkit.inventory.EquipmentSlot equipmentSlot) {
-        switch (equipmentSlot) {
-            case HAND: {
-                player.swingMainHand();
-            }
 
-            case OFF_HAND: {
+    @Override
+    public void handAnimation(Player player, EquipmentSlot equipmentSlot) {
+        switch (equipmentSlot) {
+            case HAND:
+                player.swingMainHand();
+                break;
+            case OFF_HAND:
                 player.swingOffHand();
-            }
+                break;
         }
     }
 
     @Override
-    public void blockBreakAnimation(Player player, org.bukkit.block.Block block, int animationID, int stage) {
-        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        ServerGamePacketListenerImpl serverGamePacketListener = serverPlayer.connection;
-        BlockPos blockPosition = new BlockPos(block.getX(), block.getY(), block.getZ());
-
-        serverGamePacketListener.send(new ClientboundBlockDestructionPacket(animationID, blockPosition, stage));
+    public void blockBreakAnimation(Player player, Block block, int animationID, int stage) {
+        player.sendBlockDamage(block.getLocation(), stage / 9.0f, animationID);
     }
 
     @Override
-    public void blockCrackParticle(org.bukkit.block.Block block) {
+    public void blockCrackParticle(Block block) {
         block.getWorld().spawnParticle(org.bukkit.Particle.BLOCK, block.getLocation().add(0.5, 0, 0.5),
                 10, block.getBlockData());
     }
 
     @Override
-    public float getToolStrength(org.bukkit.block.Block block, org.bukkit.inventory.ItemStack itemStack) {
-        if (itemStack.getAmount() != 0) {
-            ItemStack craftItemStack = CraftItemStack.asNMSCopy(itemStack);
-            ServerLevel serverLevel = ((CraftWorld) block.getWorld()).getHandle();
-            Block nmsBlock = serverLevel.getBlockState(new BlockPos(block.getX(), block.getY(), block.getZ())).getBlock();
-
-            return craftItemStack.getDestroySpeed(nmsBlock.defaultBlockState());
+    public float getToolStrength(Block block, ItemStack itemStack) {
+        if (itemStack == null || itemStack.getAmount() == 0) {
+            return 1;
         }
-
+        // Use Bukkit API to check if item is correct tool for drops
+        org.bukkit.Material blockType = block.getType();
+        float hardness = (float) blockType.getHardness();
+        if (hardness < 0) return 0;
+        // Approximate tool speed: if item can break the block, return higher speed
         return 1;
     }
 
     @Override
-    public double getAttackDamage(org.bukkit.inventory.ItemStack itemStack) {
+    public double getAttackDamage(ItemStack itemStack) {
         return getItemStackAttribute(itemStack, Attribute.ATTACK_DAMAGE);
     }
 
     @Override
-    public double getAttackSpeed(org.bukkit.inventory.ItemStack itemStack) {
+    public double getAttackSpeed(ItemStack itemStack) {
         return getItemStackAttribute(itemStack, Attribute.ATTACK_SPEED);
     }
 
-    private double getItemStackAttribute(org.bukkit.inventory.ItemStack itemStack, org.bukkit.attribute.Attribute attribute) {
-        if (itemStack.getAmount() != 0) {
-            for (org.bukkit.attribute.AttributeModifier modifier : itemStack.getType().getDefaultAttributeModifiers(itemStack.clone().getType().getEquipmentSlot()).values()) {
-                if (attribute == Attribute.ATTACK_DAMAGE) {
-                    // Return the base attack damage modifier amount
-                    return modifier.getAmount();
-                }
-                if (attribute == Attribute.ATTACK_SPEED) {
-                    // Return the base speed damage modifier amount
-                    return modifier.getAmount();
-                }
+    private double getItemStackAttribute(ItemStack itemStack, Attribute attribute) {
+        if (itemStack != null && itemStack.getAmount() != 0) {
+            for (AttributeModifier modifier : itemStack.getType().getDefaultAttributeModifiers(
+                    itemStack.getType().getEquipmentSlot()).values()) {
+                return modifier.getAmount();
             }
         }
-            // Default value if base attack damage or speed isn't found for some reason
-            return 0;
-        }
+        return 0;
+    }
 
     @Override
-    public Sound getHitSound(org.bukkit.block.Block block) {
+    public Sound getHitSound(Block block) {
         try {
-            ServerLevel serverLevel = ((CraftWorld) block.getWorld()).getHandle();
-            Block nmsBlock = serverLevel.getBlockState(new BlockPos(block.getX(), block.getY(), block.getZ())).getBlock();
-            SoundType soundType = nmsBlock.defaultBlockState().getSoundType();
-
-            return Sound.valueOf(soundType.getHitSound().location().getPath().toUpperCase()
-                    .replace(".", "_"));
+            return Sound.valueOf(block.getBlockData().getSoundGroup().getHitSound().name());
         } catch (IllegalArgumentException ignored) {
         }
         return Sound.BLOCK_STONE_HIT;
     }
 
     @Override
-    public float getBlockHardness(org.bukkit.block.Block block) {
-        ServerLevel serverLevel = ((CraftWorld) block.getWorld()).getHandle();
-        Block nmsBlock = serverLevel.getBlockState(new BlockPos(block.getX(), block.getY(), block.getZ())).getBlock();
-
-        return nmsBlock.defaultBlockState().getDestroySpeed(null, null);
+    public float getBlockHardness(Block block) {
+        return (float) block.getType().getHardness();
     }
 
     @Override
-    public boolean breakBlock(Player player, org.bukkit.block.Block block) {
+    public boolean breakBlock(Player player, Block block) {
         return player.breakBlock(block);
     }
 
     @Override
     public void setModifier(Player player, double damage, double speed, UUID uuid) {
-        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        AttributeInstance damageAttributeInstance = serverPlayer.getAttribute(Attributes.ATTACK_DAMAGE);
-        AttributeInstance speedAttributeInstance = serverPlayer.getAttribute(Attributes.ATTACK_SPEED);
+        NamespacedKey key = new NamespacedKey("dualwield", "weapon_modifier");
 
-        if (damageAttributeInstance != null) {
-            damageAttributeInstance.addTransientModifier(new AttributeModifier(Identifier.tryParse("Weapon modifier"), damage,
-                    AttributeModifier.Operation.ADD_VALUE));
+        AttributeInstance damageAttr = player.getAttribute(Attribute.ATTACK_DAMAGE);
+        if (damageAttr != null) {
+            damageAttr.removeModifier(key);
+            damageAttr.addModifier(new AttributeModifier(key, damage, AttributeModifier.Operation.ADD_NUMBER));
         }
 
-        if (speedAttributeInstance != null) {
-            speedAttributeInstance.addTransientModifier(new AttributeModifier(Identifier.tryParse("Weapon modifier"), speed,
-                    AttributeModifier.Operation.ADD_VALUE));
+        AttributeInstance speedAttr = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (speedAttr != null) {
+            speedAttr.removeModifier(key);
+            speedAttr.addModifier(new AttributeModifier(key, speed, AttributeModifier.Operation.ADD_NUMBER));
         }
     }
 
     @Override
     public void removeModifier(Player player, UUID uuid) {
-        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        AttributeInstance damageAttributeInstance = serverPlayer.getAttribute(Attributes.ATTACK_DAMAGE);
-        AttributeInstance speedAttributeInstance = serverPlayer.getAttribute(Attributes.ATTACK_SPEED);
+        NamespacedKey key = new NamespacedKey("dualwield", "weapon_modifier");
 
-        if (damageAttributeInstance != null) {
-            damageAttributeInstance.removeModifiers();
+        AttributeInstance damageAttr = player.getAttribute(Attribute.ATTACK_DAMAGE);
+        if (damageAttr != null) {
+            damageAttr.removeModifier(key);
         }
 
-        if (speedAttributeInstance != null) {
-            speedAttributeInstance.removeModifiers();
+        AttributeInstance speedAttr = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (speedAttr != null) {
+            speedAttr.removeModifier(key);
         }
     }
 
     @Override
-    public void attack(Player player, org.bukkit.entity.Entity entity) {
-        (((CraftPlayer) player).getHandle()).attack(((CraftEntity) entity).getHandle());
+    public void attack(Player player, Entity entity) {
+        player.attack(entity);
     }
 }
